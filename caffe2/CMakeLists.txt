@@ -150,6 +150,8 @@ if(BUILD_CAFFE2 AND (NOT INTERN_BUILD_MOBILE OR BUILD_CAFFE2_MOBILE))
     add_subdirectory(operators/rnn)
     if(USE_FBGEMM)
       add_subdirectory(quantization/server)
+      # FIXME: conv_dnnlowp_op.cc depends on fbgemm/src/RefImplementations.h
+      target_include_directories(torch_cpu PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../third_party)
     endif()
     if(USE_QNNPACK)
       add_subdirectory(operators/quantized)
@@ -736,7 +738,6 @@ if(NOT INTERN_BUILD_MOBILE OR NOT BUILD_CAFFE2_MOBILE)
       ${TORCH_SRC_DIR}/csrc/api/src/optim/schedulers/step_lr.cpp
       ${TORCH_SRC_DIR}/csrc/api/src/serialize/input-archive.cpp
       ${TORCH_SRC_DIR}/csrc/api/src/serialize/output-archive.cpp
-      ${TORCH_SRC_DIR}/csrc/utils/crash_handler.cpp
     )
   endif()
 
@@ -1073,12 +1074,6 @@ if(NOT INTERN_BUILD_MOBILE OR NOT BUILD_CAFFE2_MOBILE)
 if(USE_TBB)
   list(APPEND ATen_CPU_INCLUDE ${TBB_INCLUDE_DIR})
   target_link_libraries(torch_cpu PUBLIC TBB::tbb)
-endif()
-
-if(USE_BREAKPAD)
-  target_compile_definitions(torch_cpu PRIVATE ADD_BREAKPAD_SIGNAL_HANDLER)
-  target_include_directories(torch_cpu PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../third_party ${CMAKE_CURRENT_LIST_DIR}/../third_party/breakpad/src)
-  target_link_libraries(torch_cpu PRIVATE breakpad)
 endif()
 
   target_include_directories(torch_cpu PRIVATE ${ATen_CPU_INCLUDE})
