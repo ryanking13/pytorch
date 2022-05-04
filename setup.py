@@ -229,6 +229,8 @@ import importlib
 import time
 import sysconfig
 
+sys.path.append(os.getcwd())
+
 from tools.build_pytorch_libs import build_caffe2
 from tools.setup_helpers.env import (IS_WINDOWS, IS_DARWIN, IS_LINUX,
                                      build_type)
